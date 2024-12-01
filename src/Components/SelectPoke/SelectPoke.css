@@ -1,0 +1,19 @@
+.SelectPoke {
+    background: #111;
+    height: 300px;
+    width: 320px;
+    border: 2px solid #eee;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    
+    display: grid;
+    grid-template-rows:  repeat(3, 1fr);
+    gap: 10px;
+  }
+
+ 
+
+  
