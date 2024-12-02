@@ -40,3 +40,14 @@
 .read-the-docs {
   color: #888;
 }
+
+.squareImg {
+  width: 60%;
+  height: 60%;
+  object-fit: cover;
+}
+.turn-img {
+  width: 60%;
+  height: 60%;
+  object-fit: cover;
+}

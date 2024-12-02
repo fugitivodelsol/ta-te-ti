@@ -1,6 +1,4 @@
 import { useState, useEffect } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 import { Square } from "./Components/Square/Square"
 import { WinnerWindow } from './Components/WinnerWindow/WinnerWindow'
@@ -33,6 +31,8 @@ function App() {
   const [turn, setTurn] = useState(TURNS.X)
   const [winner, setWinner] = useState(null) //Null que no hay ganador y false empate
   const [pokemones, setPoke] = useState([])
+  const [player1Pokemon, setPlayer1Pokemon] = useState(null);
+  const [player2Pokemon, setPlayer2Pokemon] = useState(null);
 
   useEffect(()=>{
       const getPoquemones= async () => 
@@ -53,7 +53,12 @@ function App() {
            
           })
           
-          setPoke (await Promise.all(newPokemones))
+          const loadedPokemones = await Promise.all(newPokemones);
+          setPoke(loadedPokemones);
+      
+          // Asignar Pokémon a los jugadores (ejemplo con los primeros dos Pokémon):
+          setPlayer1Pokemon(loadedPokemones[0]);
+          setPlayer2Pokemon(loadedPokemones[1]);
         
       }
       getPoquemones()
@@ -108,27 +113,49 @@ function App() {
       </Button>
     <section className='game'>
       {
-        board.map((_, index)=>{
-          return ( 
-           <Square 
-           key={index} 
-           index={index}
-           updateBoard={updateBoard}>
-            {board[index]}
-           </Square>
-          )
-        })
+       board.map((cell, index) => {
+        let pokemonImage = null;
+    
+        if (cell === TURNS.X && player1Pokemon) {
+          pokemonImage = player1Pokemon.img;
+        } else if (cell === TURNS.O && player2Pokemon) {
+          pokemonImage = player2Pokemon.img;
+        }
+    
+        return (
+          <Square key={index} index={index} updateBoard={updateBoard}>
+            {pokemonImage && <img src={pokemonImage} alt="Pokemon" className='squareImg' />}
+          </Square>
+        );
+      })
       }
     </section>
     <section className = 'turn'>
       <Square isSelected={turn == TURNS.X}>
-        {TURNS.X}
+      {player1Pokemon && (
+      <img 
+        src={player1Pokemon.img} 
+        alt={player1Pokemon.name} 
+        className='turn-img' 
+      />
+        )}
+   
       </Square>
       <Square isSelected={turn == TURNS.O}>
-        {TURNS.O}
+      {player1Pokemon && (
+      <img 
+        src={player2Pokemon.img} 
+        alt={player2Pokemon.name} 
+        className='turn-img' 
+      />
+        )}
       </Square>
     </section>
-    <WinnerWindow winner = {winner} resetGame={resetGame}/>
+    
+    <WinnerWindow winner = {winner} player1={player1Pokemon?.img} player2={player2Pokemon?.img} resetGame={resetGame}>
+
+    </WinnerWindow>
+
     <SelectPoke pokemones={pokemones} />
 
   </main>
