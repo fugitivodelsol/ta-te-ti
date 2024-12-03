@@ -1,11 +1,9 @@
 import { useState, useEffect } from 'react'
 import './App.css'
-import { Square } from "./Components/Square/Square"
 import { WinnerWindow } from './Components/WinnerWindow/WinnerWindow'
 import { Button } from './Components/Button'
-import { PokeCard } from './Components/PokeCard'
 import { SelectPoke } from './Components/SelectPoke/SelectPoke'
-
+import { GameBoard } from './Components/GameBoard'
 
 const TURNS = {
   X : 'P1', //Player 1
@@ -33,6 +31,8 @@ function App() {
   const [pokemones, setPoke] = useState([])
   const [player1Pokemon, setPlayer1Pokemon] = useState(null);
   const [player2Pokemon, setPlayer2Pokemon] = useState(null);
+  const [gameStage, setGameStage] = useState("select");
+
 
   useEffect(()=>{
       const getPoquemones= async () => 
@@ -57,23 +57,35 @@ function App() {
           setPoke(loadedPokemones);
       
           // Asignar Pokémon a los jugadores (ejemplo con los primeros dos Pokémon):
-          setPlayer1Pokemon(loadedPokemones[0]);
-          setPlayer2Pokemon(loadedPokemones[1]);
+          // setPlayer1Pokemon(loadedPokemones[0]);
+          // setPlayer2Pokemon(loadedPokemones[1]);
         
       }
       getPoquemones()
   },[])
 
+  function PlayerPoke(index) {
+    if (!player1Pokemon) {
+      setPlayer1Pokemon(pokemones[index]);  // Asigna Pokémon a Player 1
+    } else if (!player2Pokemon) {
+      setPlayer2Pokemon(pokemones[index]);  // Asigna Pokémon a Player 2
+    }
+    // Cambia el stage a "Play" una vez ambos jugadores han seleccionado Pokémon
+    if (player1Pokemon && player2Pokemon) {
+      setGameStage("Play");
+      console.log(player1Pokemon)
+      console.log(player2Pokemon)
 
-  const checkWinner = (boardToCheck) => {
-    for(const combo of Winner_Combos){
-      const[a,b,c] = combo 
-      if(
-        boardToCheck[a] &&
+    }
+  }
+  
+
+  function checkWinner(boardToCheck) {
+    for (const combo of Winner_Combos) {
+      const [a, b, c] = combo
+      if (boardToCheck[a] &&
         boardToCheck[a] == boardToCheck[b] &&
-        boardToCheck[b] == boardToCheck[c]
-      )
-      {return boardToCheck[a]}
+        boardToCheck[b] == boardToCheck[c]) { return boardToCheck[a]} 
     }
   }
 
@@ -81,6 +93,9 @@ function App() {
     setBoard(Array(9).fill(null))
     setTurn(TURNS.X)
     setWinner(null)
+    setPlayer1Pokemon(null)
+    setPlayer2Pokemon(null)
+    setGameStage("select")
   }
  
   const checkEndGame = (newBoard) => {
@@ -88,6 +103,7 @@ function App() {
   }
 
   const updateBoard = (index) =>{
+    const winnerWindow = "winner"
     //no actualizar esta posición si ya tienen algo
     if(board[index]|| winner) return
     const newBoard = [...board]
@@ -101,63 +117,35 @@ function App() {
     const newWinner = checkWinner(newBoard)
    if(newWinner){
       setWinner(newWinner)
+      setGameStage(winnerWindow)
     }else if (checkEndGame(newBoard)) {
       setWinner(false)
+      setGameStage(winnerWindow)
     }
   }
  return (
   <main className='board'>
       <h1>Ta-Te-Ti</h1>
+      {gameStage === "Play" && (
+        <GameBoard 
+         board={board} 
+        updateBoard={updateBoard} 
+        player1Pokemon={player1Pokemon} 
+        player2Pokemon={player2Pokemon} 
+        turn={turn}
+        TURNS={TURNS} />)}
+      
+      {gameStage === "select" && (
+        <SelectPoke pokemones={pokemones} PlayerPoke={PlayerPoke} />)}
+
       <Button onClick={resetGame}>
         Volver a empezar
       </Button>
-    <section className='game'>
-      {
-       board.map((cell, index) => {
-        let pokemonImage = null;
     
-        if (cell === TURNS.X && player1Pokemon) {
-          pokemonImage = player1Pokemon.img;
-        } else if (cell === TURNS.O && player2Pokemon) {
-          pokemonImage = player2Pokemon.img;
-        }
-    
-        return (
-          <Square key={index} index={index} updateBoard={updateBoard}>
-            {pokemonImage && <img src={pokemonImage} alt="Pokemon" className='squareImg' />}
-          </Square>
-        );
-      })
-      }
-    </section>
-    <section className = 'turn'>
-      <Square isSelected={turn == TURNS.X}>
-      {player1Pokemon && (
-      <img 
-        src={player1Pokemon.img} 
-        alt={player1Pokemon.name} 
-        className='turn-img' 
-      />
-        )}
+     {gameStage === "winner" && (
+      <WinnerWindow winner = {winner} player1={player1Pokemon?.img} player2={player2Pokemon?.img} resetGame={resetGame}/>
+      )}
    
-      </Square>
-      <Square isSelected={turn == TURNS.O}>
-      {player1Pokemon && (
-      <img 
-        src={player2Pokemon.img} 
-        alt={player2Pokemon.name} 
-        className='turn-img' 
-      />
-        )}
-      </Square>
-    </section>
-    
-    <WinnerWindow winner = {winner} player1={player1Pokemon?.img} player2={player2Pokemon?.img} resetGame={resetGame}>
-
-    </WinnerWindow>
-
-    <SelectPoke pokemones={pokemones} />
-
   </main>
 
  )
