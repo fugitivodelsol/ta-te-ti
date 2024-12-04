@@ -66,18 +66,19 @@ function App() {
 
   function PlayerPoke(index) {
     if (!player1Pokemon) {
-      setPlayer1Pokemon(pokemones[index]);  // Asigna Pokémon a Player 1
+      setPlayer1Pokemon(pokemones[index]); // Asigna a Player 1
     } else if (!player2Pokemon) {
-      setPlayer2Pokemon(pokemones[index]);  // Asigna Pokémon a Player 2
-    }
-    // Cambia el stage a "Play" una vez ambos jugadores han seleccionado Pokémon
-    if (player1Pokemon && player2Pokemon) {
-      setGameStage("Play");
-      console.log(player1Pokemon)
-      console.log(player2Pokemon)
-
+      setPlayer2Pokemon(pokemones[index]); // Asigna a Player 2
     }
   }
+  
+  // Cambia de etapa una vez ambos jugadores tengan un Pokémon
+  useEffect(() => {
+    if (player1Pokemon && player2Pokemon) {
+      setGameStage("Play");
+      console.log(player1Pokemon, player2Pokemon); // Debugging
+    }
+  }, [player1Pokemon, player2Pokemon]);
   
 
   function checkWinner(boardToCheck) {
