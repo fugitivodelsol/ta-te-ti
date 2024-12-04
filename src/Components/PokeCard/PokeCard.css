@@ -11,6 +11,7 @@
     width: 300px; /* Ancho fijo */
     max-width: 100%; /* Que no exceda el contenedor */
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3); /* Sombra opcional */
+    cursor: pointer;
   }
   
   .pokeCard > div {

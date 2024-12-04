@@ -64,11 +64,12 @@ function App() {
       getPoquemones()
   },[])
 
-  function PlayerPoke(index) {
+  function PlayerPoke(pokemonId) {
+    const selectedPokemon = pokemones.find((poke) => poke.id === pokemonId); // Buscar por ID
     if (!player1Pokemon) {
-      setPlayer1Pokemon(pokemones[index]); // Asigna a Player 1
+      setPlayer1Pokemon(selectedPokemon); // Asigna a Player 1
     } else if (!player2Pokemon) {
-      setPlayer2Pokemon(pokemones[index]); // Asigna a Player 2
+      setPlayer2Pokemon(selectedPokemon); // Asigna a Player 2
     }
   }
   
